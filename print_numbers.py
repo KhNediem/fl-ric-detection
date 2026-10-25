@@ -35,3 +35,15 @@ if os.path.isdir(ox):
     print("\n=== B: generator sensitivity ==="); print(X("B_sensitivity.csv").round(3).to_string())
     print("\n=== C: cohort median vs Byzantine fraction ==="); print(X("C_cohort_byzfrac.csv").round(3).to_string())
     print("\n=== D: contaminated warm-up ==="); print(X("D_contaminated.csv").round(3).to_string())
+
+# ---------------- larger cohorts and D2 control (run_more.py)
+om = sys.argv[3] if len(sys.argv) > 3 else "results/more"
+if os.path.isdir(om):
+    F = pd.read_csv(f"{om}/F_d2_control.csv")
+    print("\n=== F: D2 fitted on an i.i.d. vs autocorrelated warm-up, autocorrelated scenario ===")
+    print((F.groupby(["train", "load"])[["false_iso", "flag"]].mean() * 100).round(2).to_string())
+    E_ = pd.read_csv(f"{om}/E_cohort_size.csv")
+    print("\n=== E: cohort size N ===")
+    print((E_[E_.exp == "E_benign"].groupby(["scn", "method", "N"])[["fpr", "false_iso"]].mean() * 100).round(2).unstack("N").to_string())
+    print(E_[E_.exp == "E_A1"].groupby(["scn", "method", "N"])[["det_rate", "delay"]].mean().round(2).unstack("N").to_string())
+    print((E_[E_.exp == "E_A6"].groupby(["scn", "method", "N"]).false_iso.mean() * 100).round(1).unstack("N").to_string())
