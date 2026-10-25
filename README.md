@@ -1,26 +1,35 @@
 # Network-metadata detection of protocol-deviating FL clients at the O-RAN RIC
 
-Simulation code for the paper *Network-Metadata-Based Detection of Protocol-Deviating Federated Learning Clients via the O-RAN Near-RT RIC* (WCNC 2026 submission).
+Simulation code and results for the paper *Network-Metadata-Based Detection of Protocol-Deviating Federated Learning Clients via the O-RAN Near-RT RIC* (submitted to IEEE WCNC 2026).
 
-All results in the paper come from one generator and one run (30 seeds, fixed), so a rerun gives identical numbers.
+All results in the paper come from one synthetic generator and one run (30 fixed seeds), so a rerun gives identical numbers. Tested with Python 3.13 and the package versions in `requirements.txt`.
 
 ## Files
 | file | role |
 |---|---|
 | `core.py` | synthetic generator, D1 (sample / variance floor / Ledoit-Wolf), D2 autoencoder |
 | `unified.py` | attacks A1-A8, baselines (D1-W, max-\|z\|, lag-1, timeout), cohort-median normalization, k-out-of-n decisions |
-| `run_unified.py` | runs every experiment |
-| `analyze_unified.py` | figures and summary tables |
-| `print_numbers.py` | prints every number quoted in the paper |
-| `fig_timeline.py` | schematic timeline figure |
-| `check_d2_contention.py` | explains the D2 ordering under contention |
-| `results/` | summary tables, `numbers.txt`, and the raw results (`unified.csv.gz`) |
+| `run_unified.py` | runs every experiment of the paper |
+| `analyze_unified.py` | Figs. 3-5 (`fig_benign`, `fig_detectors`, `fig_contention`) and the summary tables |
+| `print_numbers.py` | prints every number quoted in the paper from the summary tables |
+| `cond_numbers.py` | condition numbers of the covariance estimates (Sec. VII-B) |
+| `check_d2_contention.py` | explains the ordering of D2 under contention (Sec. VII-B) |
+| `fig_timeline.py` | Fig. 1 (schematic) |
+| `results/` | summary tables (`*.csv`), `numbers.txt`, raw results `unified.csv.gz` |
 
-## Reproduce
+## Check the numbers without rerunning (seconds)
 ```bash
 pip install -r requirements.txt
-python3 run_unified.py 30 results/unified.csv      # about 30 min on 2 cores
+python3 print_numbers.py results          # same output as results/numbers.txt
+gunzip -k results/unified.csv.gz
+python3 analyze_unified.py results/unified.csv results/out   # regenerates the figures
+```
+
+## Rerun everything (about 30 min on 2 cores)
+```bash
+python3 run_unified.py 30 results/unified.csv
 python3 analyze_unified.py results/unified.csv results/out
 python3 print_numbers.py results/out
+python3 cond_numbers.py
+python3 fig_timeline.py
 ```
-The condition numbers of the covariance estimates are in `results/cond_from_v1_run.csv`.
