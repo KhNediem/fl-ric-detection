@@ -56,7 +56,7 @@ ru = df[df.exp == "rules"]
 ru.groupby(["scn", "alpha", "k", "n"])[["false_iso", "A1_det", "A1_delay", "A7_det", "A7_delay", "A7aware_det", "A7aware_delay"]].mean().to_csv(f"{out}/rules.csv")
 
 # ------------------------------------------------------------ Fig. benign
-meth_b = ["D1raw", "D1floor", "D1lw", "D2", "D1W"]
+meth_b = ["D1raw", "D1floor", "D1lw", "D2", "D1W", "Zmax", "Lag1", "Timeout"]
 fig, ax = plt.subplots(2, 4, figsize=(7.16, 2.55), sharex=True)
 for j, s in enumerate(["gauss", "ar", "drift", "heavy"]):
     for k in meth_b:
@@ -71,37 +71,12 @@ for j, s in enumerate(["gauss", "ar", "drift", "heavy"]):
     ax[1, j].minorticks_off()
 ax[0, 0].set_ylabel("per-round FPR (%)"); ax[1, 0].set_ylabel("benign UEs\nisolated (%)")
 h, l = ax[0, 0].get_legend_handles_labels()
-fig.legend(h, l, loc="upper center", ncol=5, bbox_to_anchor=(0.5, 1.05), fontsize=6.5)
+fig.legend(h, l, loc="upper center", ncol=8, bbox_to_anchor=(0.5, 1.05), fontsize=6.0)
 fig.tight_layout(h_pad=0.4, w_pad=0.6)
 fig.savefig(f"{out}/fig_benign.pdf", bbox_inches="tight"); fig.savefig(f"{out}/fig_benign.png", dpi=200, bbox_inches="tight")
 plt.close(fig)
 
-# ------------------------------------------------------------ Fig. detectors (m=100)
-cols = [("A1", "shift ($\\sigma$)", "A1 delayed upload", False),
-        ("A2", "relative change", "A2 volume", True),
-        ("A4", "Mahalanobis radius", "A4 adaptive evasion", False),
-        ("A5", "amplitude ($\\sigma$)", "A5 alternation", False),
-        ("A8", "fraction skipped", "A8 free-rider", False)]
-meth_p = ["D1raw", "D1floor", "D1lw", "D2", "D1W", "Zmax", "Lag1", "Timeout"]
-pw = agg(att[att.m == 100], ["scn", "attack", "mag", "method"], "power")
-fig, ax = plt.subplots(2, 5, figsize=(7.16, 2.75), sharey=True)
-for i, s in enumerate(["gauss", "ar"]):
-    for j, (a, xl, tt, logx) in enumerate(cols):
-        for k in meth_p:
-            col, mk, ls, lab = STY[k]
-            d = pw[(pw.scn == s) & (pw.attack == a) & (pw.method == k)].sort_values("mag")
-            ax[i, j].errorbar(d.mag, d["mean"], yerr=d["ci"], color=col, marker=mk, ls=ls, ms=2.6, lw=0.9,
-                              capsize=1.0, label=lab)
-        if logx: ax[i, j].set_xscale("log")
-        if i == 0: ax[i, j].set_title(tt)
-        if i == 1: ax[i, j].set_xlabel(xl)
-        ax[i, j].set_ylim(-0.03, 1.03)
-    ax[i, 0].set_ylabel(f"power\n({SC[s]})")
-h, l = ax[0, 0].get_legend_handles_labels()
-fig.legend(h, l, loc="upper center", ncol=8, bbox_to_anchor=(0.5, 1.05), fontsize=6.3)
-fig.tight_layout(h_pad=0.4, w_pad=0.5)
-fig.savefig(f"{out}/fig_detectors.pdf", bbox_inches="tight"); fig.savefig(f"{out}/fig_detectors.png", dpi=200, bbox_inches="tight")
-plt.close(fig)
+# Fig. detectors: see analyze_extra.py (matched per-round FPR vs matched false isolation)
 
 # ------------------------------------------------------------ Fig. contention (column)
 fa = agg(a6[(a6.m == 100) & (a6.beta == 1.0)], ["scn", "f", "method"], "ben_false_iso")
@@ -115,7 +90,7 @@ for j, s in enumerate(["gauss", "ar"]):
         d = fa[(fa.scn == s) & (fa.method == k)].sort_values("f")
         ax[j].errorbar(d.f, d["mean"] * 100, yerr=d["ci"] * 100, color=col, marker=mk, ms=2.8, lw=0.9,
                        capsize=1.2, label=lab)
-    ax[j].set_title(SC[s]); ax[j].set_xlabel("loading fraction $f$ ($\\beta=1$)")
+    ax[j].set_title(SC[s]); ax[j].set_xlabel("Byzantine fraction $f$")
     ax[j].set_xticks([0, 0.1, 0.2, 0.3, 0.4])
 ax[0].set_ylabel("benign UEs\nisolated (%)")
 h, l = ax[0].get_legend_handles_labels()
