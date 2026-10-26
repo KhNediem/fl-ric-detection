@@ -15,6 +15,9 @@ All results in the paper come from one synthetic generator and one run (30 fixed
 | `analyze_extra.py` | Fig. 4 (`fig_detectors`) and the summary tables of `run_extra.py` |
 | `print_numbers.py` | prints every number quoted in the paper from the summary tables |
 | `run_more.py` | larger cohorts (N = 100, 200) and the D2 training-data control |
+| `prep_traces.py`, `trace.py` | real 5G channel traces (Raca et al., ACM MMSys 2020, https://github.com/uccmisl/5Gdataset, GPL-3.0): SNR to spectral efficiency, segments, trace-driven channel; the derived series are in `traces/se.npz` |
+| `run_trace.py`, `analyze_trace.py` | validation on real channel traces (Table I and Fig. 5 of the paper) |
+| `explore_adaptive.py`, `adaptive.py` | exploratory test of channel-aware features and online recalibration (Discussion) |
 | `cond_numbers.py` | condition numbers of the covariance estimates (Sec. VII-B) |
 | `check_d2_contention.py` | explains the ordering of D2 under contention (Sec. VII-B) |
 | `fig_timeline.py` | Fig. 1 (schematic) |
@@ -35,25 +38,27 @@ All results in the paper come from one synthetic generator and one run (30 fixed
 | detector | alpha = 1%, s_min = 0.02, 3-out-of-5, L = 5, autoencoder 15-8-3-8-15 |
 | seeds | 30 (separate benign seeds 100-129 for the matched-false-isolation thresholds) |
 
-Values are assumptions, not measurements. For reference, commercial 5G uplink peaks at about 30-60 Mbit/s on smartphones (Narayanan et al., WWW 2020), and FL on smartphones needs under 30 s of communication and 1-5 min of training per round for a model of about 50M parameters (Yang et al., WWW 2021); our update (1 MB) and delays (seconds) correspond to a smaller model and a loaded cell.
+Values are assumptions, not measurements; the validation replaces the synthetic channel by real 5G channel traces (see `prep_traces.py`; to rebuild `traces/se.npz`, clone https://github.com/uccmisl/5Gdataset, unzip `5G-production-dataset.zip`, and run `python3 prep_traces.py 5G-production-dataset traces/se.npz`). For reference, commercial 5G uplink peaks at about 30-60 Mbit/s on smartphones (Narayanan et al., WWW 2020), and FL on smartphones needs under 30 s of communication and 1-5 min of training per round for a model of about 50M parameters (Yang et al., WWW 2021); our update (1 MB) and delays (seconds) correspond to a smaller model and a loaded cell.
 
 ## Check the numbers without rerunning (seconds)
 ```bash
 pip install -r requirements.txt
-python3 print_numbers.py results results/out_extra results/more   # same output as results/numbers.txt
+python3 print_numbers.py results results/out_extra results/more results/out_trace   # same output as results/numbers.txt
 gunzip -k results/unified.csv.gz
 python3 analyze_unified.py results/unified.csv results/out   # Figs. 3 and 5
 python3 analyze_extra.py results/extra results/out_extra     # Fig. 4
 ```
 
-## Rerun everything (about 35 min on 2 cores)
+## Rerun everything (about 45 min on 2 cores)
 ```bash
 python3 run_unified.py 30 results/unified.csv
 python3 analyze_unified.py results/unified.csv results/out
 python3 run_extra.py results/extra
 python3 analyze_extra.py results/extra results/out_extra
 python3 run_more.py results/more
-python3 print_numbers.py results/out results/out_extra results/more
+python3 run_trace.py results/trace
+python3 analyze_trace.py results/trace results/out results/out_trace
+python3 print_numbers.py results/out results/out_extra results/more results/out_trace
 python3 cond_numbers.py
 python3 fig_timeline.py
 ```

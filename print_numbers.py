@@ -47,3 +47,13 @@ if os.path.isdir(om):
     print((E_[E_.exp == "E_benign"].groupby(["scn", "method", "N"])[["fpr", "false_iso"]].mean() * 100).round(2).unstack("N").to_string())
     print(E_[E_.exp == "E_A1"].groupby(["scn", "method", "N"])[["det_rate", "delay"]].mean().round(2).unstack("N").to_string())
     print((E_[E_.exp == "E_A6"].groupby(["scn", "method", "N"]).false_iso.mean() * 100).round(1).unstack("N").to_string())
+
+# ---------------- real 5G channel traces (run_trace.py -> analyze_trace.py)
+ot = sys.argv[4] if len(sys.argv) > 4 else "results/out_trace"
+if os.path.isdir(ot):
+    print("\n=== Traces: benign (fpr, false_iso) ==="); print((pd.read_csv(f"{ot}/T_benign.csv").set_index(["mob", "m", "method"]) * 100).round(2).to_string())
+    print("\n=== Traces: A6 ==="); print(pd.read_csv(f"{ot}/T_A6.csv").round(3).to_string())
+    for v in ["flag_rate", "det_rate"]:
+        t = pd.read_csv(f"{ot}/T_{v}.csv")
+        print(f"\n=== Traces: {v} ==="); print(t.pivot_table(index=["mob", "m", "cal", "attack", "mag"], columns="method", values=v).round(2).to_string())
+    print("\n=== Traces: matched false isolation, benign ==="); print(pd.read_csv(f"{ot}/T_benign_fi1.csv").round(4).to_string())
