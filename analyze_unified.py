@@ -13,7 +13,7 @@ df = pd.read_csv(src)
 plt.rcParams.update({"font.family": "serif", "font.size": 7, "pdf.fonttype": 42, "axes.grid": True,
                      "grid.alpha": 0.25, "grid.linewidth": 0.5, "legend.frameon": False,
                      "axes.titlesize": 7, "axes.labelsize": 7, "xtick.labelsize": 6.5, "ytick.labelsize": 6.5})
-SC = {"gauss": "stationary Gaussian", "ar": "autocorrelated", "drift": "slow drift", "heavy": "heavy-tailed"}
+SC = {"gauss": "i.i.d.", "ar": "autocorrelated", "drift": "drifting", "heavy": "heavy-tailed"}
 STY = {"D1raw": ("#999999", "o", "-", "D1 sample cov."),
        "D1floor": ("#0072B2", "s", "-", "D1 + variance floor"),
        "D1lw": ("#009E73", "^", "-", "D1 + Ledoit-Wolf"),

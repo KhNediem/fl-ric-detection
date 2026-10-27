@@ -4,7 +4,7 @@ o = sys.argv[1] if len(sys.argv) > 1 else "results/out"
 P = lambda f: pd.read_csv(f"{o}/{f}")
 f, fi = P("benign_fpr.csv"), P("benign_false_iso.csv")
 st = f[f.scn.isin(["gauss", "ar", "heavy"])]
-print("per-round FPR range (stationary, excl. timeout): %.2f-%.2f %%" % tuple(100 * st[st.method != "Timeout"]["mean"].agg(["min", "max"])))
+print("per-round FPR range (i.i.d., autocorrelated, heavy-tailed; excl. timeout): %.2f-%.2f %%" % tuple(100 * st[st.method != "Timeout"]["mean"].agg(["min", "max"])))
 print("timeout FPR range: %.2f-%.2f %%" % tuple(100 * st[st.method == "Timeout"]["mean"].agg(["min", "max"])))
 print("\nfalse isolation (%), 3-of-5:"); print((fi.pivot_table(index=["scn", "m"], columns="method", values="mean") * 100).round(1).to_string())
 print("\nper-UE rates (D1 LW):"); print(P("perue_rates_D1lw.csv").round(4).to_string())

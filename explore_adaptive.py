@@ -12,7 +12,7 @@ def gen(scn,s):
     if scn in ('gauss','ar'):
         rng=np.random.default_rng([s,SCENARIOS.index(scn),m]); par=generate(scn,T,rng)
     else:
-        rng=np.random.default_rng([s,10+['static','driving'].index(scn),m]); par=trace.generate_trace_single(scn,T,rng)
+        rng=np.random.default_rng([s,10+['static','driving'].index(scn),m]); par=trace.generate_trace(scn,T,rng)
     return par, rng
 def evaluate(F_fn, online, X, par, obs, byzset):
     F=F_fn(X,obs)

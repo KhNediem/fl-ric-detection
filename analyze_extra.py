@@ -12,7 +12,7 @@ plt.rcParams.update({"font.family": "serif", "font.size": 7, "pdf.fonttype": 42,
 STY = {"D1lw": ("#009E73", "^", "-", "D1 (Ledoit-Wolf)"), "D2": ("#D55E00", "D", "-", "D2 autoencoder"),
        "D1W": ("#56B4E9", "v", "--", "D1 on 5-round window"), "Zmax": ("#E69F00", "<", "--", "max-$|z|$"),
        "Lag1": ("#CC79A7", ">", "--", "lag-1"), "Timeout": ("#000000", "x", ":", "pooled timeout")}
-SC = {"gauss": "Gaussian", "ar": "autocorrelated"}
+SC = {"gauss": "i.i.d.", "ar": "autocorrelated"}
 t = pd.read_csv(f"{src}/A_test.csv"); a = t[t.exp == "A"]
 def ci(x):
     x = np.asarray(x, float); x = x[~np.isnan(x)]

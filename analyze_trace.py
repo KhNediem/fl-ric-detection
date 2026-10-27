@@ -19,7 +19,7 @@ d[d.exp == "benign_fi1"].groupby(["mob", "method"])[["fpr", "false_iso"]].mean()
 fi = pd.read_csv(f"{syn}/benign_false_iso.csv"); fi = fi[fi.m == 100].set_index(["scn", "method"])["mean"]
 meth = ["D1lw", "D2", "D1W", "Zmax", "Lag1", "Timeout"]
 lab = ["D1", "D2", "D1-W", "max-|z|", "lag-1", "timeout"]
-sets = [("Gaussian", lambda k: fi[("gauss", k)]), ("autocorr.", lambda k: fi[("ar", k)]),
+sets = [("i.i.d.", lambda k: fi[("gauss", k)]), ("autocorr.", lambda k: fi[("ar", k)]),
         ("real static", lambda k: b.loc[("static", 100, k), "false_iso"]),
         ("real driving", lambda k: b.loc[("driving", 100, k), "false_iso"])]
 cols = ["#bbbbbb", "#777777", "#0072B2", "#D55E00"]

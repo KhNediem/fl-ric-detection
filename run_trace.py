@@ -9,7 +9,7 @@ import numpy as np, pandas as pd
 from multiprocessing import Pool
 from core import CFG, features, Detectors
 from unified import *
-from trace import generate_trace_single as generate_trace
+from trace import generate_trace
 
 MOBS = ["static", "driving"]
 DETS = ["D1raw", "D1floor", "D1lw", "D2", "D1W", "Zmax", "Lag1", "Timeout"]

@@ -1,6 +1,6 @@
 # Network-metadata detection of protocol-deviating FL clients at the O-RAN RIC
 
-Simulation code and results for the paper *Network-Metadata-Based Detection of Protocol-Deviating Federated Learning Clients via the O-RAN Near-RT RIC* (submitted to IEEE WCNC 2026).
+Simulation code and results for the paper *Can the O-RAN RIC Protect Federated Learning? Detection and False Isolation from Network Metadata* (submitted to IEEE WCNC 2026).
 
 All results in the paper come from one synthetic generator and one run (30 fixed seeds), so a rerun gives identical numbers. Tested with Python 3.13 and the package versions in `requirements.txt`.
 
@@ -10,17 +10,19 @@ All results in the paper come from one synthetic generator and one run (30 fixed
 | `core.py` | synthetic generator, D1 (sample / variance floor / Ledoit-Wolf), D2 autoencoder |
 | `unified.py` | attacks A1-A8, baselines (D1-W, max-\|z\|, lag-1, timeout), cohort-median normalization, k-out-of-n decisions |
 | `run_unified.py` | runs every experiment of the paper |
-| `analyze_unified.py` | Figs. 3 and 5 (`fig_benign`, `fig_contention`) and the summary tables |
+| `analyze_unified.py` | Figs. 3 and 6 (`fig_benign`, `fig_contention`) and the summary tables |
 | `run_extra.py` | matched 1% false-isolation comparison (offline diagnostic), generator sensitivity, Byzantine fraction with cohort normalization, contaminated warm-up |
 | `analyze_extra.py` | Fig. 4 (`fig_detectors`) and the summary tables of `run_extra.py` |
 | `print_numbers.py` | prints every number quoted in the paper from the summary tables |
 | `run_more.py` | larger cohorts (N = 100, 200) and the D2 training-data control |
 | `prep_traces.py`, `trace.py` | real 5G channel traces (Raca et al., ACM MMSys 2020, https://github.com/uccmisl/5Gdataset, GPL-3.0): SNR to spectral efficiency, segments, trace-driven channel; the derived series are in `traces/se.npz` |
 | `run_trace.py`, `analyze_trace.py` | validation on real channel traces (Table I and Fig. 5 of the paper) |
+
+Trace-driven channel (`trace.py`): for each run, the segments of one mobility type (20 static, 63 driving, at least 400 s each) are concatenated in a random order; each UE starts at a random point and has one FL round every 10 s, and its per-round channel is the mean spectral efficiency over the 4 s upload window. The earlier variant that spread the rounds of a UE over a single segment (`generate_trace_single`) sampled the channel more densely than rounds can occur and is kept only for comparison.
 | `explore_adaptive.py`, `adaptive.py` | exploratory test of channel-aware features and online recalibration (Discussion) |
-| `cond_numbers.py` | condition numbers of the covariance estimates (Sec. VII-B) |
-| `check_d2_contention.py` | explains the ordering of D2 under contention (Sec. VII-B) |
-| `fig_timeline.py` | Fig. 1 (schematic) |
+| `cond_numbers.py` | condition numbers of the covariance estimates (Finding 1) |
+| `check_d2_contention.py` | explains the ordering of D2 under contention (Finding 4) |
+| `fig_timeline.py` | Fig. 2 (schematic) |
 | `results/` | summary tables (`*.csv`), `numbers.txt`, raw results `unified.csv.gz`; `results/extra/` raw and `results/out_extra/` summaries of `run_extra.py` |
 
 ## Simulation parameters
@@ -35,7 +37,7 @@ All results in the paper come from one synthetic generator and one run (30 fixed
 | volume overhead | at most 0.4% |
 | log channel gain | std 0.25; i.i.d., AR(1) 0.8, drift 0.001/round, or t3 |
 | rounds | m in {30, 50, 100, 200} warm-up, 100 calibration, 200 evaluation |
-| detector | alpha = 1%, s_min = 0.02, 3-out-of-5, L = 5, autoencoder 15-8-3-8-15 |
+| detector | alpha = 1%, 3-out-of-5, L = 5, autoencoder 15-8-3-8-15; s_min = 0.02 is the minimum per-feature std of the standardization used by D2 and the baselines (D1 uses Ledoit-Wolf; the variance-floor D1 variant is only a comparison) |
 | seeds | 30 (separate benign seeds 100-129 for the matched-false-isolation thresholds) |
 
 Values are assumptions, not measurements; the validation replaces the synthetic channel by real 5G channel traces (see `prep_traces.py`; to rebuild `traces/se.npz`, clone https://github.com/uccmisl/5Gdataset, unzip `5G-production-dataset.zip`, and run `python3 prep_traces.py 5G-production-dataset traces/se.npz`). For reference, commercial 5G uplink peaks at about 30-60 Mbit/s on smartphones (Narayanan et al., WWW 2020), and FL on smartphones needs under 30 s of communication and 1-5 min of training per round for a model of about 50M parameters (Yang et al., WWW 2021); our update (1 MB) and delays (seconds) correspond to a smaller model and a loaded cell.
@@ -45,7 +47,7 @@ Values are assumptions, not measurements; the validation replaces the synthetic 
 pip install -r requirements.txt
 python3 print_numbers.py results results/out_extra results/more results/out_trace   # same output as results/numbers.txt
 gunzip -k results/unified.csv.gz
-python3 analyze_unified.py results/unified.csv results/out   # Figs. 3 and 5
+python3 analyze_unified.py results/unified.csv results/out   # Figs. 3 and 6
 python3 analyze_extra.py results/extra results/out_extra     # Fig. 4
 ```
 
